@@ -85,7 +85,7 @@ There are a few differences between the available saga persisters which boil dow
 
 While neither of the solutions is particularly helpful in this case, optimistic concurrency can make the situation a lot worse. Assuming that many messages to the same saga are in the queue, retrying a message due to a concurrency exception won't help much, as it will just enter a new race condition every time. After failing multiple times, recoverability will fail the message and move it to the error queue. This means the user has to manually retry the message later on instead of recoverability handling the issue automatically.
 
-I hope you now have a better understanding of why a Saga is a bad choice to implement the Scatter-Gather patten in almost all cases. The only exceptions might be situations where the responses trickle in slowly after each other than in parallel or when you're only scattering a very low amount of messages (< 5). Sagas are made to implement long-running processes and while their API might invite for other applications sometimes, there is a high chance that it ends up being a bad choice.
+I hope you now have a better understanding of why a NServiceBus Saga is a suboptimal choice to implement the Scatter-Gather patten in almost all cases. The only exception might be a situation where responses trickle in slowly after each other, or when you're only scattering a very low amount of messages (< 5). Sagas are made to implement long-running processes and while their API might invite for other implementations, there is a high chance that it ends up being a bad choice.
 
 We will look into a better solution for the Scatter-Gather pattern in the next blog post.
 
