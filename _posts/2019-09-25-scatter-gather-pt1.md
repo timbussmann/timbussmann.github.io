@@ -7,13 +7,15 @@ This article series is about showing how to implement the Scatter-Gather pattern
 
 Scatter-Gather is one of the patterns mentioned in the [Enterprise Integration Patterns book](https://www.amazon.com/Enterprise-Integration-Patterns-Designing-Deploying/dp/0321200683). [It is described as](https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html):
 
-> Use a Scatter-Gather that broadcasts a message to multiple recipients and re-aggregates the responses back into a single message.
+> The Scatter-Gather routes a request message to the a number of recipients. It then uses an Aggregator to collect the responses and distill them into a single response message.
 
-The pattern consists of two parts: Broadcasting a message to multiple recipients and then using the [Aggregator pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html) to gather responses. A variation is to split an incoming message into smaller sub-messages (which each produce a response) instead of broadcasting. This variation is described as the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html). So technically, in this blog post, I'm going to use a Splitter+Aggregator sample but it's not a big difference to using the actual Scatter-Gather pattern when using NServiceBus and everything described here holds true in both cases.
+The pattern consists of two parts: Broadcasting a message to multiple recipients and then using the [Aggregator pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html) to gather responses.
 
 
-### Scatter
-Scattering (or broadcasting, or splitting) is fairly easy with NServiceBus. This sample handler shows how to split an incoming message in a bunch of subsequent messages for further processing. Alternatively, this could also be a handler publishing an event to multiple subscribers.
+### Broadcast
+
+There are multiple ways to "broadcast" a message to multiple recipients. Typically, broadcasting is associated with [Publish-Subscribe](https://www.enterpriseintegrationpatterns.com/patterns/messaging/PublishSubscribeChannel.html) which is implemented using the `Publish` API in NServiceBus. However, there are many different patterns to send messages to multiple recipients and it depends on the type of the message, the recipients and the form of coupling between sender and receivers to find the best way to "broadcast".
+In this blog post, I'm going to use the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html): An incoming message is split into multiple smaller messages which can then be processed independently (and parallel) from each other. The result of each "sub-message" is then aggregated back to a single result again. This pattern is implemented using regular `Send` operations in NServiceBus. For the remainer of this blog post, it doesn't make a big difference whether you publish an event or send commands.
 
 ```
 public async Task Handle(OrderPlaced message, IMessageHandlerContext context)
@@ -29,10 +31,10 @@ public async Task Handle(OrderPlaced message, IMessageHandlerContext context)
 }
 ```
 
-NServiceBus takes care of batching outgoing messages: If the handler fails with an exception at any point, no message is sent*.
+Based on an incoming message, the snippet above splits the items in the order into separate processing commands and sends them out for parallel processing. NServiceBus takes care of batching outgoing messages: If the handler fails with an exception at any point, no message is sent*.
 
-### Gather
-Let's say we expect a response message for every sent message, and we want to continue the business process once all responses have been received. This means we need some persistent state to keep track of the expected responses. Very often, people decide to use a [Saga](https://docs.particular.net/nservicebus/sagas) for this, as it provides a shared state across multiple message handlers. The Scatter-Gather implementation would probably look something like this:
+### Aggregate
+Whether we use events or commands, in both cases we expect multiple responses and we want to consolidate their results. This means we need some persistent state across all responses which stores each response's result. Very often, people decide to use a [Saga](https://docs.particular.net/nservicebus/sagas) for this, as it provides a shared state across multiple message handlers out of the box. The Scatter-Gather implementation would probably look something like this:
 
 ```
 class ScatterGather : Saga<ScatterGatherSagaData>,
