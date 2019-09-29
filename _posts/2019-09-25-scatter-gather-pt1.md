@@ -34,6 +34,7 @@ public async Task Handle(OrderPlaced message, IMessageHandlerContext context)
 Based on an incoming message, the snippet above splits the items in the order into separate processing commands and sends them out for parallel processing. NServiceBus takes care of batching outgoing messages: If the handler fails with an exception at any point, no message is sent.
 
 ### Aggregate
+
 Whether we use events or commands, in both cases we expect multiple responses and we want to consolidate their results. This means we need some persistent state across all responses which stores each response's result. Very often, people decide to use a [Saga](https://docs.particular.net/nservicebus/sagas) for this, as it provides a shared state across multiple message handlers out of the box. The Scatter-Gather implementation would probably look something like this:
 
 ```
@@ -77,8 +78,6 @@ This looks quite nice, the Saga API provides a simple solution to implement the 
 
 ### Sagas and concurrency
 
-Sagas are specifically designed to implement long-running business processes, while Scatter-Gather typically is mostly just a short-lived aggregation process. There are no specific numbers to define what's long-running or short-lived in terms of sagas though. In most cases, scattering is used to parallelize work which means that we expect a lot of responses to arrive back to the saga at the same time. Parallelizing work is most likely not relevant to your business process itself, so this fact should be a better indicator than the lifetime of the saga.
-
 When a handler of a saga is invoked, the state of the saga is loaded from the database. This leads to a situation where multiple responses want to update the same saga instance concurrently (keep in mind that NServiceBus can handle multiple messages concurrently by default). Sagas can't handle concurrency, there is only one message which can successfully complete a saga at one time because they all touch the same data.
 
 There are a few differences between the available saga persisters which boil down to whether they use pessimistic or optimistic concurrency control to resolve concurrency issues on the same saga instance.**
@@ -93,6 +92,8 @@ This is an exerpt from the log file when you try to run this saga using the Part
 While neither of the concurrency control modes is particularly helpful in this case, optimistic concurrency can make the situation a lot worse. Assuming that many messages to the same saga are in the queue, retrying a message due to a concurrency exception won't help much, as it will just enter a new race condition every time. After failing multiple times, recoverability will fail the message and move it to the error queue. This means the user has to manually retry the message later on instead of recoverability handling the issue automatically.
 
 ### Summary
-While the broadcasting step of the Scatter-Gather pattern is straight-forward to implement with NServiceBus, the aggregation phase is trickier due to the high risk of race conditions. I hope you now have a better understanding of why a NServiceBus Saga is a suboptimal choice to implement the Scatter-Gather patten in almost all cases. The only exception might be a situation where responses trickle in slowly after each other, or when you're only scattering a very low amount of messages (< 5). Sagas are made to implement long-running processes and while their API might invite for other implementations, there is a high chance that it ends up being a bad choice. If some messages handled by your saga feel more like a technical implementation than related to the actual business process, it might be a good indicator to review that saga.
+
+While the broadcasting step of the Scatter-Gather pattern is straight-forward to implement with NServiceBus, the aggregation phase is trickier due to the high risk of race conditions. Sagas are specifically designed to implement long-running business processes, while Scatter-Gather typically is mostly just a short-lived aggregation step. There are no specific numbers to define what's long-running or short-lived in terms of sagas though. In most cases, scattering is used to parallelize work which means that we expect a lot of responses to arrive back to the saga at the same time. The only exception might be a situation where responses trickle in slowly after each other, or when you're only scattering a very low amount of messages (< 5).
+Parallelizing work is most likely not relevant to your business process itself, so this fact should be a better indicator than the lifetime of the saga. 
 
 We will look into a better solution for the Scatter-Gather pattern in the next blog post.
