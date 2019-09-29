@@ -31,7 +31,7 @@ public async Task Handle(OrderPlaced message, IMessageHandlerContext context)
 }
 ```
 
-Based on an incoming message, the snippet above splits the items in the order into separate processing commands and sends them out for parallel processing. NServiceBus takes care of batching outgoing messages: If the handler fails with an exception at any point, no message is sent*.
+Based on an incoming message, the snippet above splits the items in the order into separate processing commands and sends them out for parallel processing. NServiceBus takes care of batching outgoing messages: If the handler fails with an exception at any point, no message is sent.
 
 ### Aggregate
 Whether we use events or commands, in both cases we expect multiple responses and we want to consolidate their results. This means we need some persistent state across all responses which stores each response's result. Very often, people decide to use a [Saga](https://docs.particular.net/nservicebus/sagas) for this, as it provides a shared state across multiple message handlers out of the box. The Scatter-Gather implementation would probably look something like this:
@@ -97,7 +97,5 @@ While the broadcasting step of the Scatter-Gather pattern is straight-forward to
 
 We will look into a better solution for the Scatter-Gather pattern in the next blog post.
 
-
-*There is no absolute guarantee that the outgoing messages are atomic with completing the incoming message unless you're using a transaction mode of `SendsAtomicWithReceive` or higher. There is always some edge case that might interrupt the actual dispatch operation (e.g. a network failure in the middle of dispatching the batch), but NServiceBus does it's best to keep the window for such edge cases as small as possible. This is a topic for another blog post though.
 
 **SQL Persistence [uses pessimistic concurrency control for querying saga data](https://docs.particular.net/persistence/sql/saga-concurrency#concurrent-access-to-existing-saga-instances). NHibernate persistence [can be configured to use pessimistic concurrency control](https://docs.particular.net/persistence/nhibernate/saga-concurrency#adjusting-the-locking-strategy).
