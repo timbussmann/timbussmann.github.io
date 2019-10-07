@@ -7,7 +7,7 @@ This article series is about showing how to implement the Scatter-Gather pattern
 
 Scatter-Gather is one of the patterns mentioned in the [Enterprise Integration Patterns book](https://www.amazon.com/Enterprise-Integration-Patterns-Designing-Deploying/dp/0321200683). [It is described as](https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html):
 
-> The Scatter-Gather routes a request message to the a number of recipients. It then uses an Aggregator to collect the responses and distill them into a single response message.
+> The Scatter-Gather routes a request message to a number of recipients. It then uses an Aggregator to collect the responses and distill them into a single response message.
 
 The pattern consists of two parts: Broadcasting a message to multiple recipients and then using the [Aggregator pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html) to gather responses.
 
@@ -15,7 +15,7 @@ The pattern consists of two parts: Broadcasting a message to multiple recipients
 ### Broadcast
 
 There are multiple ways to "broadcast" a message to multiple recipients. Typically, broadcasting is associated with [Publish-Subscribe](https://www.enterpriseintegrationpatterns.com/patterns/messaging/PublishSubscribeChannel.html) which is implemented using the `Publish` API in NServiceBus. However, there are many different ways to send messages to multiple recipients depending on the type of the message, the recipients, and the form of coupling between senders and receivers.
-In this blog post, I'm going to use the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html): An incoming message is split into multiple smaller messages which can then be processed independently (and in parallel) from each other. The result of each "sub-message" is then aggregated back to a single result again. This pattern is implemented using regular `Send` operations in NServiceBus. Strictly speaking, this might not match 100% with the definition of the Scatter-Gather pattern as we're sending multiple messages of the same type (with different values) but for the remainer of this blog post, it doesn't make a big difference whether you publish an event or send commands.
+In this blog post, I'm going to use the [Splitter pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html): An incoming message is split into multiple smaller messages which can then be processed independently (and in parallel) from each other. The result of each "sub-message" is then aggregated back to a single result again. This pattern is implemented using regular `Send` operations in NServiceBus. Strictly speaking, this might not match 100% with the definition of the Scatter-Gather pattern as we're sending multiple messages of the same type (with different values) but for the remainder of this blog post, it doesn't make a big difference whether you publish an event or send commands.
 
 ```
 public async Task Handle(OrderPlaced message, IMessageHandlerContext context)
@@ -87,7 +87,7 @@ There are a few differences between the available saga persisters which boil dow
 > NServiceBus.RecoverabilityExecutor Immediate Retry is going to retry message 'e203d802-1bca-4e0a-82e9-aad300e21fa1' because of an exception:  
 >    MongoDB.Driver.MongoCommandException: Command update failed: WriteConflict.
 
-This is an exerpt from the log file when you try to run this saga using the Particular Software MongoDB persistence. The MongoDB saga persistence uses optimistic concurrency control so concurrent saga updates are only detected once the data is being updated and rejected. As pointed out by the log statement, this exception isn't a problem itself as retrying the message should usually solve this problem.
+This is an excerpt from the log file when you try to run this saga using the Particular Software MongoDB persistence. The MongoDB saga persistence uses optimistic concurrency control so concurrent saga updates are only detected once the data is being updated and rejected. As pointed out by the log statement, this exception isn't a problem itself as retrying the message should usually solve this problem.
 
 While neither of the concurrency control modes is particularly helpful in this case, optimistic concurrency can make the situation a lot worse. Assuming that many messages to the same saga are in the queue, retrying a message due to a concurrency exception won't help much, as it will just enter a new race condition every time. After failing multiple times, recoverability will fail the message and move it to the error queue. This means the user has to manually retry the message later on instead of recoverability handling the issue automatically.
 
