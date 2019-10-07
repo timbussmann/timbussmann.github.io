@@ -78,7 +78,7 @@ This looks quite nice, the Saga API provides a simple solution to implement the 
 
 ### Sagas and concurrency
 
-When a handler of a saga is invoked, the state of the saga is loaded from the database. This leads to a situation where multiple responses want to update the same saga instance concurrently (keep in mind that NServiceBus can handle multiple messages concurrently by default). Sagas can't handle concurrency, there is only one message which can successfully complete a saga at one time because they all touch the same data.
+When a handler of a saga is invoked, the state of the saga is loaded from the database. This leads to a situation where multiple responses want to update the same saga instance concurrently (keep in mind that NServiceBus can handle multiple messages concurrently by default). Sagas can't resolve concurrency, there is only one message which can successfully complete a saga at one time because they all touch the same data.
 
 There are a few differences between the available saga persisters which boil down to whether they use pessimistic or optimistic concurrency control to resolve concurrency issues on the same saga instance.
 * With optimistic concurrency control, concurrent access to the same saga data is only noticed once the message handler has completed and tries to update the saga's state. At this point, a concurrency exception will be raised by the database, failing the message. Recoverability mechanism will then ensure that the message is retried. You will notice some sort of concurrency related exceptions in your endpoint's log files if that occurs. Most supported NServiceBus persisters use optimistic concurrency control.
