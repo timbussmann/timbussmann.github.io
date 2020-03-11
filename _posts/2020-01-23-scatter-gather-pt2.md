@@ -68,7 +68,7 @@ class GatherHandler : IHandleMessages<ResponseMessage>
                 Result = message.RequestResult,
                 SagaId = message.SagaId
             });
-}
+    }
 }
 ```
 
