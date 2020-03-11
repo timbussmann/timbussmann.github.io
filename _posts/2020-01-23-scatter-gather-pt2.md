@@ -3,7 +3,7 @@ layout: post
 title: Scatter-Gather in NServiceBus, part 2
 ---
 
-In the [previous blog post](TODO) we concluded that sagas struggle to deal with scenarios where a multiple messages need to update the same saga instance. Depending on the persistence option, this can manifest differently in practice:
+In the [previous blog post](/2019/09/25/scatter-gather-pt1.html) we concluded that sagas struggle to deal with scenarios where a multiple messages need to update the same saga instance. Depending on the persistence option, this can manifest differently in practice:
 * For persistence options using pessimistic locking, the described scneario will slow down the endpoint's throughput as the locking mechanism will only allow a single message to be processed at a time per saga instance.
 * For persistence options using optimistic concurrency control, the endpoint can run into many concurrency violation exceptions. These exceptions will force the losing transactions to retry, potentially causing large amounts of retries. At some point, messages might even be moved to the error queue due to exceding the configured retry limits.
 
