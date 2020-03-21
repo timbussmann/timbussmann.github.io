@@ -61,13 +61,12 @@ class GatherHandler : IHandleMessages<ResponseMessage>
         var mongoCollection = mongoSession.Client.GetDatabase(Program.DatabaseName)
             .GetCollection<ResponseResult>("results");
 
-        await mongoCollection
-            .InsertOneAsync(mongoSession, new ResponseResult
-            {
-                Id = context.MessageId,
-                Result = message.RequestResult,
-                SagaId = message.SagaId
-            });
+        await mongoCollection.InsertOneAsync(mongoSession, new ResponseResult
+        {
+            Id = context.MessageId,
+            Result = message.RequestResult,
+            SagaId = message.SagaId
+        });
     }
 }
 ```
