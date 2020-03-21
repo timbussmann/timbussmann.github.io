@@ -47,7 +47,7 @@ class ScatterGatherSaga : Saga<ScatterGatherSagaData>,
 
 Another endpoint will respond to each `RequestResponseCommand` with a `ResponseMessage`. Instead of handling those directly as part of the saga, we implement a stateless message handler.
 
-### The handler
+### Gathering
 
 The handler designed to gather responses receives `ResponseMessage`(s) and store the results in an append-only manner into a database (e.g. MongoDB in this case):
 
