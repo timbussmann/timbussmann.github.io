@@ -7,7 +7,7 @@ In the [previous blog post](/2019/09/25/scatter-gather-pt1.html) we concluded th
 * For persistence options using pessimistic locking, the described scenario will slow down the endpoint's throughput as the locking mechanism will only allow a single message to be processed at a time per saga instance.
 * For persistence options using optimistic concurrency control, the endpoint can run into many concurrency violation exceptions. These exceptions will force the losing transactions to retry, potentially causing large amounts of retries. At some point, messages might even be moved to the error queue due to exceeding the configured retry limits.
 
-If you'd have to chose between one of the options, you'd probably prefer the pessimistic locking approach. The throughput limitations are probably less severe than the impact of multiple retries and are way better than dealing with messages in the error queue. Luckily, most of the supported Saga persistence options support pessimistic locking for sagas by now (the MongoDB and ServiceFabric persistence packages just recently switched to pessimistic locking). Particular Software also vastly improved the official [documentation on saga concurrency](https://docs.particular.net/nservicebus/sagas/concurrency), describing different concurrency problems and approaches to solve those, a highly recommended read.
+If you'd have to chose between one of the options, you'd probably prefer the pessimistic locking approach. The throughput limitations are most likely less severe than the impact of multiple retries and are way better than dealing with messages in the error queue. Luckily, most of the supported Saga persistence options support pessimistic locking for sagas by now (the MongoDB and ServiceFabric persistence packages just recently switched to pessimistic locking). Particular Software also vastly improved the official [documentation on saga concurrency](https://docs.particular.net/nservicebus/sagas/concurrency), describing different concurrency problems and approaches to solve those, a highly recommended read.
 
 In most cases, using a persistence option with pessimistic locking capabilities will prevent major problems for you, at the cost of slower throughput at some times. However, there is another approach that doesn't impact the endpoint throughput and also won't cause concurrency exceptions and retries. It's a lot more complex than just using pessimistic locking but sometimes the throughput limitations can be an important factor or you might rely on a persistence technology that doesn't support pessimistic locking. Here's a rough overview of how this approach works:
 
@@ -49,7 +49,7 @@ Another endpoint will respond to each `RequestResponseCommand` with a `ResponseM
 
 ### Gathering
 
-The handler designed to gather responses receives `ResponseMessage`(s) and store the results in an append-only manner into a database (e.g. MongoDB in this case):
+The handler designed to gather responses receives `ResponseMessage`s and store the results in an append-only manner into a database (e.g. MongoDB in this case):
 
 
 ```
@@ -73,7 +73,7 @@ class GatherHandler : IHandleMessages<ResponseMessage>
 
 Let's have a look at the information stored when each response is received:
 * Result: This one is not surprising, we want to aggregate this information once all results arrived.
-* SagaId: This allows us to find all responses which belong together (to the same saga).
+* BatchId: This allows us to find all responses which belong together (to the same saga).
 * Id: We use the message ID as a unique value to ensure that retries do not cause duplicate entries (this is a rare edge-case but it can always happen using transports without distributed transactions). In case of a duplicate, the insert will fail with a unique key constraint violation. For the sake of simplicity, I did not add any error handling for this sample code, but this exception should be handled.
 
 For the append-only storage, use whatever database you're already using but design the structure in a way that all data is only added without any chance of concurrency conflicts.
