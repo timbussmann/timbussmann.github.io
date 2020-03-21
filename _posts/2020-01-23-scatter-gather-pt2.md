@@ -65,7 +65,7 @@ class GatherHandler : IHandleMessages<ResponseMessage>
         {
             Id = context.MessageId,
             Result = message.RequestResult,
-            SagaId = message.SagaId
+            BatchId = message.BatchId
         });
     }
 }
