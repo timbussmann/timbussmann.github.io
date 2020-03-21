@@ -113,13 +113,12 @@ class ScatterGatherSaga : Saga<ScatterGatherSagaData>,
             .GetCollection<ResponseResult>("results");
 
         var totalDocuments = await mongoCollection.CountDocumentsAsync(mongoSession,
-            Builders<ResponseResult>.Filter.Eq(d => d.SagaId, Data.Identifier));
+            Builders<ResponseResult>.Filter.Eq(d => d.BatchId, Data.BatchId));
         if (totalDocuments >= Data.NumberOfMessages)
         {
-            // all responses received, aggregate data
+            Console.WriteLine($"All responses for saga {Data.BatchId} received.");
             var responses = await mongoCollection
-                .FindAsync<ResponseResult>(mongoSession, 
-                    Builders<ResponseResult>.Filter.Eq(r => r.SagaId, Data.Identifier));
+                .FindAsync<ResponseResult>(mongoSession, Builders<ResponseResult>.Filter.Eq(r => r.BatchId, Data.BatchId));
 
             int result = responses.ToEnumerable().Sum(response => response.Result);
             Console.WriteLine("Total result is: " + result);
@@ -127,7 +126,7 @@ class ScatterGatherSaga : Saga<ScatterGatherSagaData>,
         }
         else
         {
-            // request another timeout until we have all the response messages
+            Console.WriteLine($"not all responses came in. Currently at {totalDocuments}/{Data.NumberOfMessages}");
             await RequestTimeout<CheckStatus>(context, TimeSpan.FromSeconds(1));
         }
     }
