@@ -25,6 +25,8 @@ Since NServiceBus 7 is targeting .NET Standard, it doesn't use the .NET specific
 
 Following the [.NET Core assembly resolving algorithm](https://docs.microsoft.com/en-us/dotnet/core/dependency-loading/loading-managed#algorithm), this handler will be invoked as the final attempt to resolve the requested assembly. And because we're calling `Type.GetType` from an assembly that has been loaded via `Assembly.LoadFrom`, it will now also search the same folder of the requesting assembly (`NServicebus.Core.dll` in this case).
 
+## A simple repro
+
 Mixing in NServiceBus might make this sound quite complicated to digest. We can distill this down into a reasonably simple plain vanilla repro sample:
 
 The following is a .NET Core application. It references another assembly, called `TypeLoader.dll`. `TypeLoader.dll` contains a single, trivial type:
