@@ -21,7 +21,7 @@ With NServiceBus version 7, the type was found using `Type.GetType`, and the con
 
 To better understand the resolving behavior, I used `dotnet-trace` to [collect detailed assembly loading logging from the runtime](https://docs.microsoft.com/en-us/dotnet/core/dependency-loading/collect-details). The generated trace file can be loaded with [PerfView](https://github.com/microsoft/perfview) and gives detailed insights into an application's assembly loading/resolution behavior. In these event traces, I noticed that the NServiceBus 7 trace had an event which the version 8 trace did not have: `AppDomainAssemblyResolveHandlerInvoked`. In the event's data, I could see a `Handler` property with the value `LoadFromResolveHandler`. So apparently, there was a special assembly resolver registered that was able to resolve the assembly location. I was pretty sure that NServiceBus itself did not register such a handler.
 
-![PerfView showing the AppDomainAssemblyResolveHandlerInvoked event](../assets/perfview.png)
+![PerfView showing the AppDomainAssemblyResolveHandlerInvoked event](/assets/perfview.png)
 
 Digging deeper, I [found the handler in the runtime](https://github.com/dotnet/runtime/blob/45005830255a78caab66cef1757dcb77536f4c0d/src/libraries/System.Private.CoreLib/src/System/Reflection/Assembly.cs#L280). Reading the behavior of this resolve handler, I realized the fairly small difference between NServiceBus 7 and 8 which completely changed the assembly probing behavior:
 
