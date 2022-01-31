@@ -28,7 +28,7 @@ Console.WriteLine($"{nameof(myValue)} = {myValue}"); // => "myValue = 42"
 Console.WriteLine($"{nameof(myValue)} == 42 = {myValue == 42}"); // => "myValue == 42 = True"
 ```
 
-Note that C# also has a [`Trace` class](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.debug), but it doesn't provide any more helpful APIs for this, so I'll ignore it for this post.
+Note that C# also has a [`Debug` class](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.debug), but it doesn't provide any more helpful APIs for this, so I'll ignore it for this post.
 
 With `[CallerArgumentExpression]` we can build a simple helper method:
 
@@ -56,8 +56,8 @@ Much nicer to read! We could also provide the file name and line number informat
 
 ## Console.Debug?
 
-Rust's `dbg!` is even more powerful. It can output complex types with no/minimal effort. The C# helper currently can't do that as it relies on the `ToString()` implementation (stay tuned, don't despair!).
+Rust's `dbg!` is even more powerful. It can output complex types with no/minimal effort. The C# helper currently can't do that as it relies on the `ToString()` implementation (for now).
 
-It would also be nicer to use this helper method directly on the `Console` type (or on the `Debug` class). For example, something like `Console.Debug(myValue == 42)`. Unfortunately, C# doesn't allow static extension methods for classes. Maybe, it's time to suggest a new API to the .NET team.
+It would also be nicer to use this helper method directly on the `Console` type (or on the `Debug` class). For example, something like `Console.Debug(myValue == 42)`. Unfortunately, C# doesn't allow static extension methods for classes.
 
 Disclaimer: Obviously, using proper debugging tools is a better choice in most cases. The presented approach can be a friendly little helper. Here, the main intention was to show another use case for the `[CallerArgumentExpression]` attribute.
