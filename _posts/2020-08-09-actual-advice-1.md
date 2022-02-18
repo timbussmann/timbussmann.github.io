@@ -1,12 +1,9 @@
 ---
 layout: post
-title: Actual Advice #1: Start at a suistainable pace
+title: Start at a suistainable pace
 ---
 
-
-This is the first blog post of a format I'd like to use to share the advice I received throughout my career. There is so much advice out there that, in most cases, you'll always find someone defending and someone else challenging any advice, so I won't claim this advice to be universally correct. I want to share the advice that worked for me, which made me better, not necessarily only at my job.
-
-I received this first advice from my highly valued colleague and co-worker, Daniel Marbach. While he is a genius software engineer, he is also a gym enthusiast. Some day, I expressed my frustration about the lack of enjoyment and motivation I get from doing fitness exercises. I've mostly tried bodyweight training as I could do my workouts at home, but I failed at completing exercise goals several times. I struggled to find motivation, causing me to find excuses to skip training again and again. At some point, you stop because you give up your hope of achieving your training plan. Daniel's advice was straightforward, and you probably wonder why I even bother to write this down: Set yourself a goal that you are confident of achieving every single time. For me, this goal was to do my exercises just once a week.
+I received this advice from my highly valued colleague and co-worker, [Daniel Marbach](https://twitter.com/danielmarbach). While he is a genius software engineer, he is also a gym enthusiast. Some day, I expressed my frustration about the lack of enjoyment and motivation I get from doing fitness exercises. I've mostly tried bodyweight training as I could do my workouts at home, but I failed at completing exercise goals several times. I struggled to find motivation, causing me to find excuses to skip training again and again. At some point, you stop because you give up your hope of achieving your training plan. Daniel's advice was straightforward, and you probably wonder why I even bother to write this down: Set yourself a goal that you are confident of achieving every single time. For me, this goal was to do my exercises just once a week.
 
 Admittedly, this goal is not very ambitious, and every fitness trainer would probably also tell me how inefficient this is, but this is not what this small goal is about. The goal should help you to build up a new habit. And for this, it works like a charm. At the time of writing this, I did my exercises once every single week for about six months. This is far beyond the timeframe I managed to keep up my exercise schedule before, and the habit of doing my exercises became more and more natural. Doing your exercises once a week consistently over many months or years is still better than doing it three times a week for only a month. 
 
