@@ -61,3 +61,17 @@ Rust's `dbg!` is even more powerful. It can output complex types with no/minimal
 It would also be nicer to use this helper method directly on the `Console` type (or on the `Debug` class). For example, something like `Console.Debug(myValue == 42)`. Unfortunately, C# doesn't allow static extension methods for classes.
 
 Disclaimer: Obviously, using proper debugging tools is a better choice in most cases. The presented approach can be a friendly little helper. Here, the main intention was to show another use case for the `[CallerArgumentExpression]` attribute.
+
+### Update:
+
+The previous statement about C# not being able to print useful information on complex types is not completely true anymore. [record types have a compiler-generated `ToString` implementation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record#built-in-formatting-for-display) that prints property information of the record by default. Therefore, the helper method  also works nicely with record types:
+
+```cssharp
+var myClass = new MyClass { StringProperty = "Hello world!", IntProperty = 42};
+ConsoleHelper.Debug(myClass); // => "myClass = MyClass"
+
+var myRecord = new MyRecord("hello world!", 42);
+ConsoleHelper.Debug(myRecord); // => "myRecord = MyRecord { StringProperty = hello world!, IntProperty = 42 }"
+```
+
+That's a neat feature of record types that I completely forgot about but can come in really handy.
