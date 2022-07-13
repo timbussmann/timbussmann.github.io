@@ -5,7 +5,7 @@ title: Premature disposal
 
 Since the introduction of `async/await`, plenty of pitfalls could cause all sorts of errors and deadlocks. Often, these little mistakes were subtle and hard to detect for developers less experienced (less burned) with `async/await`.
 
-For that reason, Particular Software started early shipping custom code analyzers with NServiceBus to help detect some common mistakes like missing `await` statements. Luckily, over the past few years, the tooling for .NET has drastically improved and can more reliably detect many of these mistakes. But still, it's relatively easy to fall into the remaining pitfalls when not paying close attention for a short moment. I'd argue that some new (fantastic) language features make this even more accessible.
+For that reason, Particular Software started early shipping [a custom code analyzer](https://github.com/Particular/NServiceBus/blob/master/src/NServiceBus.Core.Analyzer/AwaitOrCaptureTasksAnalyzer.cs) with NServiceBus to help detect the very common mistake of missing `await` statements. Luckily, over the past few years, the tooling for .NET has drastically improved and can more reliably detect many of these mistakes. But still, it's relatively easy to fall into the remaining pitfalls when not paying close attention for a short moment. I'd argue that some new (fantastic) language features make this even more accessible.
 
 ## Old mistake, new packaging
 
