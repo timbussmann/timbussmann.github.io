@@ -88,7 +88,7 @@ static Task DoSomething(MyDisposableClass myDisposableClass)
 }
 ```
 
-An implementation like the presented one can avoid the cost of asynchronous methods when it is expected that the async path is only rarely used. However, it makes it even harder to notice the initial mistake of not `await`ing the method call because the code might work just fine most of times. Until it doesn't.
+An implementation like the presented one can avoid the cost of asynchronous methods when it is expected that the async path is only rarely used. However, it makes it even harder to notice the initial mistake of not `await`ing the method call because the code might work just fine most of the times. Until it doesn't.
 
 ## Conclusion
 
