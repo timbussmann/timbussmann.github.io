@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Premature disposal
+title: async/await Pitfalls: Premature Disposal
 ---
 
 Since the introduction of `async/await`, plenty of pitfalls could cause all sorts of errors and deadlocks. Often, these little mistakes were subtle and hard to detect for developers less experienced (less burned) with `async/await`.
