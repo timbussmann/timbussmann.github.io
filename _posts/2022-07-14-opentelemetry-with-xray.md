@@ -1,6 +1,7 @@
 ---
 layout: post
 title: OpenTelemetry tracing with AWS X-Ray
+enable_mermaid: true
 ---
 
 NServiceBus version 8 will come with OpenTelemetry instrumentation to capture message processing traces and metrics and export those to any OpenTelemetry compatible tooling. Some tools like Jaeger or Honeycomb are easy to setup and configure. Others require a bit more effort and AWS X-Ray definitely is one of those. In this post I'm documenting how to configure a .NET application to send NServiceBus (and any other) OpenTelemetry data to X-Ray in a development environment. My development environment is using Windows, WSL2 and Docker, so your experience on a different OS might differ (but I expect it to be simpler).
@@ -22,12 +23,12 @@ Make sure all these steps are done for both the `Publisher` and the `Subscriber`
 
 Unlike other OpenTelemetry exporters, X-Ray integration happens via a dedicated collector from the AWS Distro for OpenTelemetry (ADOT) project. The .NET application will export OpenTelemetry data via the OpenTelemetry protocol to the ADOT collector which in turn will export the collected data to AWS X-Ray.
 
-```mermaid
+<div class="mermaid">
 flowchart TD
     Publisher-->|OTLP|C(ADOT Collector)
     Subscriber-->|OTLP|C
     C-->X(AWS X-Ray)
-```
+</div>
 
 Let's get started:
 
