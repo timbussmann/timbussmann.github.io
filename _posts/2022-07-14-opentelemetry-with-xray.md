@@ -67,4 +67,7 @@ We can drill into a trace by clicking on it to see more details about the messag
 
 ![AWS X-Ray trace details view](/assets/aws-trace-details-view.png)
 
-Compared to other OpenTelemetry tools, like [Jaeger](https://www.jaegertracing.io/) the X-Ray visualization is missing a lot of details. E.g., it is not showing the different endpoints involved in a trace. There is likely further configuration and instrumentation required to use X-Rays capabilities fully, but other tools seem to be a step ahead with OpenTelemetry compatibility.
+
+## Conclusion
+
+Compared to other OpenTelemetry tools, like [Jaeger](https://www.jaegertracing.io/) the X-Ray integration requires more effort and the visualization is missing a lot of details. E.g., it is not showing the different endpoints involved in a trace. There is likely further configuration and instrumentation required to use X-Rays capabilities fully, but other tools seem to be a step ahead with OpenTelemetry compatibility.
