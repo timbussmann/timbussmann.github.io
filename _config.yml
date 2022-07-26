@@ -1,5 +1,8 @@
 #theme: jekyll-theme-minimal
 remote_theme: daviddarnes/alembic
+title: Tim Bussmann
+description: > # this is multipline section
+  Tim's notes.
 
 plugins:
  - jekyll-feed
