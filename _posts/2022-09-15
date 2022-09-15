@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Disposables and Dependency Injection
-enable_mermaid: true
 ---
 
 Chances that you've been using a dependency injection container in a C# application are extremely high. All DI containers I'm aware of provide the capability of a _child container_ or _scope_ as the Microsoft DI abstraction calls it. Scopes are providing a dedicated instance lifetime controlled by the user. Consider the following code:
