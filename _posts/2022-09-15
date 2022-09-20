@@ -80,7 +80,9 @@ using (var scope = serviceProvider.CreateScope())
 }
 ```
 
-As always, the answer is "it depends". In our case, it depends on the dependency injection container used.
+As always, the answer is "it depends."
+
+In our case, it depends on the dependency injection container used.
 
 ## Microsoft ServiceProvider
 
