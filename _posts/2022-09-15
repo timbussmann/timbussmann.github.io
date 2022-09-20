@@ -36,7 +36,7 @@ using (var scope = serviceProvider.CreateScope())
 }
 ```
 
-Disposing the scope will also call dispose on the `MyService` instance. It implements `IDisposable`. That's not too surprising, but let's look at some more nuanced scenarios:
+Disposing the scope will also call dispose on the `MyService` instance since it implements `IDisposable`. That's not too surprising, but let's look at some more nuanced scenarios:
 
 What will the `DisposeCounter` value be if the resolved type does not implement `IDisposable`, but the implementation does?
 
@@ -90,9 +90,9 @@ Let's start with the Microsoft ServiceProvider. By now, it's not just one of the
 
 If we build the `IServiceProvider` using `var serviceProvider = serviceCollection.BuildServiceProvider()` we get the following `DisposeCounter` values:
 
-1. 1
-1. 2
-1. 3
+1. When resolving `I1` by building an `Impl` instance directly, `DisposeCounter` will be 1.
+1. When resolving `I1` via resolving `Impl`, `DisposeCounter` will be 2.
+1. When resolving `I1` via resolving `I2`, resolving `Impl`, `DisposeCounter` will be 3.
 
 From that, we can conclude the implementation [inspects the resolved instances at runtime](https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.DependencyInjection/src/ServiceLookup/ServiceProviderEngineScope.cs#L53) to determine whether they implement `IDisposable` or not. The container registration can't determine the runtime type of the factory method (or at least not easily).
 
@@ -104,9 +104,9 @@ Did you assume (or guess) the correct results for the Microsoft container? If no
 
 Let's look at the results when we use LightInject by creating the `IServiceProvider` using `serviceCollection.CreateLightInjectServiceProvider()`:
 
-1. 1
-1. 1
-1. 1
+1. When resolving `I1` by building an `Impl` instance directly, `DisposeCounter` will be 1. This is the same behavior as with Microsoft's implementation.
+1. When resolving `I1` via resolving `Impl`, `DisposeCounter` will also be 1.
+1. When resolving `I1` via resolving `I2`, resolving `Impl`, `DisposeCounter` will also be 1.
 
 Similar to the Microsoft implementation, LightInject can detect resolved instances implementing `IDisposable`. But LightInject avoids disposing the same instance multiple times.
 
@@ -126,13 +126,11 @@ Although we've seen that different containers might behave differently when disp
 
 > To help ensure that resources are always cleaned up appropriately, a Dispose method should be idempotent, such that it is callable multiple times without throwing an exception. Furthermore, subsequent invocations of Dispose should do nothing.
 
-As long as we stick to this guideline, the different implementations shouldn't affect the correctness of your system.
+As long as we stick to this guideline, the different container implementations shouldn't affect the correctness of your system.
 
 
 ## Conclusion
 
-Dependency injection containers do not only automatically dispose dependencies directly implementing the `IDisposable` interface. They will also take care of any disposable service implementation that is not visible to the consumer of the dependency.
+Dependency injection containers do not only automatically dispose dependencies directly implementing the `IDisposable` interface, they will also take care of any disposable implementation that is not visible to the consumer of the dependency. Therefore, when implementing an interface with a class that needs to dispose its resources, there is no need to push `IDisposable` to the implemented interface.
 
-The exact behavior of the container in regards to disposing resolved instances can vary. For more complicated dependency chains, predicting the number of times `Dispose` will be called can be tricky.
-
-However, this should ultimately belong in the "useless knowledge" category because if you follow the general .NET coding guidelines, `Dispose` should be idempotent. That said, rest assured that plenty of implementations out there might run into issues in the shown examples (there is a reason this blog post exists ;)).
+The exact behavior of the container in regards to disposing resolved instances can vary though. For more complicated dependency chains, predicting the number of times `Dispose` will be called can be tricky. However, this shouldn't matter because if you follow the general .NET coding guidelines, `Dispose` should be idempotent. That said, rest assured that plenty of implementations out there might run into issues in the shown examples (there is a reason this blog post exists ;)).
