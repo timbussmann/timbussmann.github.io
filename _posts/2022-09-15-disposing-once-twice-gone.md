@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Dispsing once, disposing twice, gone!
+title: Disposing once, disposing twice, gone!
 ---
 
 Chances that you've been using a dependency injection (DI) container in a C# application are incredibly high. All DI containers I know come with a _child container_ or _scope_ capability, as the Microsoft DI abstraction calls it. Scopes provide a dedicated instance lifetime controlled by the user. Consider the following code:
