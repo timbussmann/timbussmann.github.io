@@ -3,7 +3,7 @@ layout: post
 title: Fun with assembly versions
 ---
 
-Assembly loading remains a gift that keeps on giving. What do you expect the outcome of the following code to be:
+Assembly loading remains a gift that keeps on giving. On a previous blog post I've focused on the assembly-resolving logic that tries to load an assembly which isn't already loaded but is deployed along with our application. This post focuses specifically on the type-resolving behavior when trying to retrieve the type from an assembly that is already loaded but with a different version in the provided fully qualified assembly name. What do you expect the outcome of the following code to be:
 
 ```csharp
 var demoClassType = typeof(DemoClass);
@@ -25,11 +25,15 @@ Console.WriteLine("Type.GetType for version 3: " + t3);
 
 ## .NET Framework
 
-Brining back ye olde .NET Framework for some nostalgia first. The [documentation](https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/general/assembly-version-assembly-file-version) states:
+Brining back ye olde .NET Framework for some nostalgia first. The [official documentation](https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/general/assembly-version-assembly-file-version) states:
 
 >  At runtime, Common Language Runtime (CLR) looks for assembly with this version number to load. But remember this version is used along with name, public key token and culture information only if the assemblies are strong-named signed. If assemblies aren't strong-named signed, only file names are used for loading.
 
 Since I'm not using strong-naming here, the version should not be relevant. And indeed, all calls to `Type.GetType` return a result (which is equal to the result of `t1`).
+
+```
+TODO console output
+```
 
 ## .NET (Core)
 
@@ -43,17 +47,26 @@ So as long as we're loading the same or a lower version number of the type, it w
 
 But, [as I pointed out in an earlier blog post](TODO LINK), using `Assembly.LoadFrom` can change the loading behavior quite a bit. It doesn't just affect how/where it loads assembly from (e.g. if you can load assemmblies from disk that you're not referencing in your `deps.json` file) but also the version resolving behavior. So if we add a little `Assembly.LoadFrom("LoaderApp.dll");` (LoaderApp is the name of the console application that we're running), suddenly all `Type.GetType` calls return a type. Note that we have to load the assembly of the application that tries to resolve the type, not the assembly that contains the type (that wouldn't work)!
 
+```
+TODO print console outut
+```
+
 ## nUnit
 
-If you think you'll make sure your assembly/resolving code works by writing unit tests for it, let's look at the output when we run the code in a (.NET) nUnit test:
+If you think you'll make sure your assembly/resolving code works by writing unit tests for it, let's look at the output when we run the code in an nUnit test:
 
 ```
 test case code
 ```
 
-With nUnit, all the `Type.GetType` calls also work, although they didn't work in a plain .NET console application (representing your production application). nUnit [adds it's own `Resolving` event handler](https://github.com/nunit/nunit/blob/master/src/NUnitFramework/framework/Internal/AssemblyHelper.cs#L106) to the default `AssemblyLoadContext`. As the [managed assembly loading algorithm](https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/loading-managed) documents, that event will be raised when the assembly couldn't be found initially. nUnit hooks into this event and takes care of loading it anyway, ignoring version numbers in the process.
+results in the following test output:
 
-TODO: what about xUnit?
+```
+TODO print console outut
+```
+
+With nUnit, all the `Type.GetType` calls also work, although they didn't work in a plain .NET console application (representing your production application). nUnit [adds it's own `Resolving` event handler](https://github.com/nunit/nunit/blob/master/src/NUnitFramework/framework/Internal/AssemblyHelper.cs#L106) to the default `AssemblyLoadContext`. As the [managed assembly loading algorithm](https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/loading-managed) documents, that event will be raised when the assembly couldn't be found initially. nUnit hooks into this event and takes care of loading it anyway, ignoring version numbers in the process. Running the same test with xUnit shows the same behavior as the nUnit test (although I'm not quite sure how xUnit handles this, I suspect this code to be responsible for it), so changing the testing framework won't do much.
+
 
 ## Conclusion
 
