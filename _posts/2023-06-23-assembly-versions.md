@@ -3,20 +3,24 @@ layout: post
 title: Fun with assembly versions
 ---
 
-Assembly loading remains a gift that keeps on giving. On a previous blog post I've focused on the assembly-resolving logic that tries to load an assembly which isn't already loaded but is deployed along with our application. This post focuses specifically on the type-resolving behavior when trying to retrieve the type from an assembly that is already loaded but with a different version in the provided fully qualified assembly name. What do you expect the outcome of the following code to be:
+Assembly loading remains a gift that keeps on giving. On a previous blog post I've focused on the assembly-resolving logic that tries to load an assembly which isn't already loaded but is deployed along with our application. This post focuses specifically on the type-resolving behavior when trying to retrieve the type from an assembly that is already loaded but with a different version in the provided fully qualified assembly name. Here's a rough diagram explaining the deployment:
+
+![](/assets/assembly-version-overview.png)
+
+What do you expect the outcome of the following code to be:
 
 ```csharp
 var demoClassType = typeof(DemoClass);
 Console.WriteLine(demoClassType.AssemblyQualifiedName); 
-// -> "Playground.DemoClass, Playground, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"
+// -> "MyLibrary.DemoClass, MyLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"
 
-var t1 = Type.GetType("Playground.DemoClass, Playground, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null");
+var t1 = Type.GetType("MyLibrary.DemoClass, MyLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null");
 Console.WriteLine("Type.GetType for version 2: " + t1);
 
-var t2 = Type.GetType("Playground.DemoClass, Playground, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+var t2 = Type.GetType("MyLibrary.DemoClass, MyLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 Console.WriteLine("Type.GetType for version 1: " + t2);
 
-var t3 = Type.GetType("Playground.DemoClass, Playground, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null");
+var t3 = Type.GetType("MyLibrary.DemoClass, MyLibrary, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null");
 Console.WriteLine("Type.GetType for version 3: " + t3);
 
 ```
@@ -74,5 +78,5 @@ Predicting the behavior of assembly and type loading operations remains tricky a
 
 ```csharp
 // leave out version information
-Type.GetType("Playground.DemoClass, Playground, Culture=neutral, PublicKeyToken=null");
+Type.GetType("MyLibrary.DemoClass, MyLibrary, Culture=neutral, PublicKeyToken=null");
 ```
