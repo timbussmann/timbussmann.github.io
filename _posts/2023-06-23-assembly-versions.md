@@ -28,7 +28,9 @@ One hundred points if your answer was the everlasting "it depends" ;) Let's look
 
 ## .NET Framework
 
-Brining back ye olde .NET Framework for some nostalgia first. The [official documentation](https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/general/assembly-version-assembly-file-version) states:
+Let's bring back the old .NET Framework for some nostalgia first. 
+
+The [official documentation](https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/general/assembly-version-assembly-file-version) states the following:
 
 >  At runtime, Common Language Runtime (CLR) looks for assembly with this version number to load. But remember this version is used along with name, public key token and culture information only if the assemblies are strong-named signed. If assemblies aren't strong-named signed, only file names are used for loading.
 
