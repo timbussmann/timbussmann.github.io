@@ -7,7 +7,7 @@ Assembly loading remains a gift that keeps on giving. On a previous blog post I'
 
 ![](/assets/assembly-version-overview.png)
 
-What do you expect the outcome of the following code to be:
+What do you expect is the outcome of the following code?
 
 ```csharp
 var demoClassType = typeof(DemoClass);
@@ -24,7 +24,7 @@ var t3 = Type.GetType("MyLibrary.DemoClass, MyLibrary, Version=3.0.0.0, Culture=
 Console.WriteLine("Type.GetType for version 3: " + t3);
 ```
 
-100 Points if your answer was the obligatory "it depends" ;) Let's look at a few cases:
+One hundred points if your answer was the everlasting "it depends" ;) Let's look at a few cases:
 
 ## .NET Framework
 
@@ -32,7 +32,7 @@ Brining back ye olde .NET Framework for some nostalgia first. The [official docu
 
 >  At runtime, Common Language Runtime (CLR) looks for assembly with this version number to load. But remember this version is used along with name, public key token and culture information only if the assemblies are strong-named signed. If assemblies aren't strong-named signed, only file names are used for loading.
 
-Since I'm not using strong-naming here, the version should not be relevant. And indeed, all calls to `Type.GetType` return a result (which is equal to the result of `t1`).
+Since I'm not using strong-naming here, the version should not be relevant. And indeed, all calls to `Type.GetType` return a result (equal to the result of `t1`).
 
 ```
 MyLibrary.DemoClass, MyLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -43,7 +43,7 @@ Type.GetType for version 3: MyLibrary.DemoClass
 
 ## .NET (Core)
 
-It hasn't been that easy to find some documentation on the behavior on .NET. But .NET changed a lot under the hood since AppDomains aren't really a thing anymore, so while things are kinda similar, sometimes they are not. The above code returns:
+It hasn't been easy to find documentation on the .NET behavior. In .NET, a lot changed under the hood; for example, AppDomains aren't a thing. While things are similar, sometimes they are not. The above-presented code snippet returns:
 
 ```
 MyLibrary.DemoClass, MyLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -52,9 +52,15 @@ Type.GetType for version 1: MyLibrary.DemoClass
 Type.GetType for version 3:
 ```
 
-So as long as we're loading the same or a lower version number of the type, it will be found. If we load a higher number however, .NET returns `null`.
+It will be found as long as we're loading the same or a lower version number of the type. However, if we try to load a higher number, .NET returns `null`.
 
-But, [as I pointed out in an earlier blog post](https://timbussmann.github.io/2021/10/18/assembly-resolving.html), using `Assembly.LoadFrom` can change the loading behavior quite a bit. It doesn't just affect how/where it loads assembly from (e.g. if you can load assemmblies from disk that you're not referencing in your `deps.json` file) but also the version resolving behavior. So if we add a little `Assembly.LoadFrom("MyConsoleApp.dll");` (note that in .NET we need to load the DLL, not the exe file), suddenly all `Type.GetType` calls return a type. Note that we have to load the assembly of the application that tries to resolve the type, not the assembly that contains the type (that wouldn't work)!
+[As I pointed out in an earlier blog post](https://timbussmann.github.io/2021/10/18/assembly-resolving.html), using `Assembly.LoadFrom` can change the loading behavior quite a bit.
+
+It doesn't just affect how/where it loads assembly from (e.g. if you can load assemblies from disk, that you're not referencing in your `deps.json` file) but also the version resolving behavior.
+
+If we add a little `Assembly.LoadFrom("MyConsoleApp.dll");` (note that in .NET, we need to load the DLL, not the exe file), suddenly, all `Type.GetType` calls return a type.
+
+Note: we have to load the assembly of the application that tries to resolve the type, not the assembly that contains the type—that wouldn't work!
 
 ```
 MyLibrary.DemoClass, MyLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -63,9 +69,9 @@ Type.GetType for version 1: MyLibrary.DemoClass
 Type.GetType for version 3: MyLibrary.DemoClass
 ```
 
-## nUnit
+## NUnit
 
-You might think you'll make sure your assembly/resolving code works by writing unit tests for it. éet's look at the output when we run the code in an nUnit test:
+You might think you'll ensure your assembly/resolving code works by writing unit tests. Let's look at the output when we run the code in an NUnit test:
 
 ```
 [Test]
@@ -89,7 +95,7 @@ public void GetTypeTest()
 }
 ```
 
-results in the following successful test output:
+The successful test outputs the following results:
 
 ```
 MyLibrary.DemoClass, MyLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -98,16 +104,18 @@ Type.GetType for version 1: MyLibrary.DemoClass
 Type.GetType for version 3: MyLibrary.DemoClass
 ```
 
-With nUnit, all the `Type.GetType` calls also work, although they didn't work in a plain .NET console application (representing the production application). nUnit [adds it's own `Resolving` event handler](https://github.com/nunit/nunit/blob/master/src/NUnitFramework/framework/Internal/AssemblyHelper.cs#L106) to the default `AssemblyLoadContext`. As the [managed assembly loading algorithm](https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/loading-managed) documents, that event will be raised when the assembly couldn't be found initially. nUnit hooks into this event and takes care of loading it anyway, ignoring version numbers in the process. Running the same test with xUnit shows the same behavior as the nUnit test (although I'm not quite sure how xUnit handles this, I suspect [this code](https://github.com/xunit/visualstudio.xunit/blob/ff89c51f426085d115fbf20b3527182fbd56b7f1/src/xunit.runner.visualstudio/Utility/AssemblyResolution/AssemblyHelper_NetCoreApp.cs#L93C6-L93C6) to be responsible for it), so changing the testing framework won't do much.
+All the `Type.GetType` calls also work with NUnit, although they didn't work in a straightforward .NET console application (representing the production application). NUnit [adds its own `Resolving` event handler](https://github.com/nunit/nunit/blob/master/src/NUnitFramework/framework/Internal/AssemblyHelper.cs#L106) to the default `AssemblyLoadContext`. As the [managed assembly loading algorithm](https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/loading-managed) documents, that event will be raised when the assembly isn't initially found. NUnit hooks into this event and loads it anyway, ignoring version numbers.
+
+Running the same test with xUnit shows the same behavior as the NUnit test (although I'm not quite sure how xUnit handles this, I suspect [this code](https://github.com/xunit/visualstudio.xunit/blob/ff89c51f426085d115fbf20b3527182fbd56b7f1/src/xunit.runner.visualstudio/Utility/AssemblyResolution/AssemblyHelper_NetCoreApp.cs#L93C6-L93C6) to be responsible for it). It means that changing the testing framework won't do much.
 
 
 ## Conclusion
 
-Predicting the behavior of assembly and type loading operations remains tricky and behavior can easily change in different environments. Due to the behavior in unit testing frameworks, this is also really hard to test reliably. Another approach is to just ignore the version from the fully qualified assembly name: 
+Predicting the behavior of assembly and type loading operations remains tricky. The behavior can easily change in different environments. Due to the behavior in unit testing frameworks, this is also really hard to test reliably. Another approach is to ignore the version from the fully qualified assembly name: 
 
 ```csharp
 // leave out version information
 Type.GetType("MyLibrary.DemoClass, MyLibrary, Culture=neutral, PublicKeyToken=null");
 ```
 
-This call works in all of the examples mentioned above and returns the expected type. Leaving out the version might be the most reliable call to resolve a type, but on the other hand if you are certain that you don't have to deal with breaking changes on a type.
+This call works in the abovementioned examples and returns the expected type. Leaving out the version might be the most reliable way to resolve a type, but on the other hand, you must be sure that you don't have to deal with breaking changes on the loaded types.
