@@ -3,7 +3,7 @@ layout: post
 title: Fun with assembly versions
 ---
 
-Assembly loading remains a gift that keeps on giving. On a previous blog post I've focused on the assembly-resolving logic that tries to load an assembly which isn't already loaded but is deployed along with our application. This post focuses specifically on the type-resolving behavior when trying to retrieve the type from an assembly that is already loaded but with a different version in the provided fully qualified assembly name. Here's a rough diagram explaining the deployment:
+Assembly loading remains a gift that keeps on giving. In a [previous blog](https://timbussmann.github.io/2021/10/18/assembly-resolving.html) post, I focused on the assembly-resolving logic that tries to load an assembly that isn't already loaded but is deployed along with our application. This post focuses specifically on the type-resolving behavior when retrieving the type from an assembly already loaded but with a different version in the provided fully qualified assembly name. Here's a rough diagram explaining the deployment:
 
 ![](/assets/assembly-version-overview.png)
 
