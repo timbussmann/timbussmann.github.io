@@ -5,8 +5,6 @@ title: Messaging technologies showdown - scaling clients
 
 The term "messaging" has become as ambiguous as "service". There are many messaging technologies available and while the all provide publish-subscribe capabilities, there are many subtle differences across these technologies. One angle that I find helpful to distinguish these technologies is by looking at the client (subscriber) side.
 
-In this post, I'll examine different messaging technologies from the perspective of business applications that handle **discrete business events**, e.g., `OrderPlaced`. Discrete business events typically continue an asychronously implemented business process. This is a major difference from telemetry data or change data capture streams, which have different semantics and purposes.
-
 ## Logical and physical clients
 
 There are two ways to think about clients: Logical and physical clients. The physical ones are the effective processes being deployed and running on a machine; I'll call these "client instances." On the other hand, a logical client represents the application code that is consuming messages from the queuing technology. A (logical) application needs to be deployed, at which point there will be at least one physical instance running. However, in modern environments, client instances are often scaled so that multiple client instances belong to the same "logical" client. This article is focused on scenarios where you will have multiple instances of a logical client.
