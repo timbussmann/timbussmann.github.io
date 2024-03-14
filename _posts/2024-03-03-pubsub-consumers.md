@@ -5,7 +5,7 @@ title: Messaging technologies showdown - scaling clients
 
 The term "messaging" has become as ambiguous as "service". There are many messaging technologies available and while the all provide publish-subscribe capabilities, there are many subtle differences across these technologies. One angle that I find helpful to distinguish these technologies is by looking at the client (subscriber) side.
 
-In this post I'll look at different messaging technologies from the angle of typical business applications that handle **discrete business events**, e.g. "OrderPlaced". Discrete business events typically continue an asychronously implemented business process. This is a major difference from telemetry data or change data capature streams which has entirely different semantics and purposes.
+In this post, I'll examine different messaging technologies from the perspective of business applications that handle **discrete business events**, e.g., `OrderPlaced`. Discrete business events typically continue an asychronously implemented business process. This is a major difference from telemetry data or change data capture streams, which have different semantics and purposes.
 
 ## Logical and physical clients
 
