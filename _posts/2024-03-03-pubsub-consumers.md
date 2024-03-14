@@ -9,7 +9,7 @@ In this post I'll look at different messaging technologies from the angle of typ
 
 ## Logical and physical clients
 
-There are two ways to think about subscribers: logical and physical subscribers. Physical subscribers are the effective processes being deployed and running on a machine, I'll call these "client instances". A logical subscriber represents the application code that is consuming messages from the queing technology. A (logical) application needs to be deployed, at which point there will be at least one physical instance running. However, in modern environments client instances are often scaled so that there will be multiple client instances that belong to the same "logical" client. This blog is focused on scenarios where you will have multiple instances of a logical client.
+There are two ways to think about clients: Logical and physical clients. The physical ones are the effective processes being deployed and running on a machine; I'll call these "client instances." On the other hand, a logical client represents the application code that is consuming messages from the queuing technology. A (logical) application needs to be deployed, at which point there will be at least one physical instance running. However, in modern environments, client instances are often scaled so that multiple client instances belong to the same "logical" client. This article is focused on scenarios where you will have multiple instances of a logical client.
 
 Note: Scalability isn't the only reason for having multiple client instances. When deploying new versions in an environment that supports zero-downtime deployments (e.g. Kubernetes), you'll most likely encounter situations with multiple active client instances (running on different versions!).
 
