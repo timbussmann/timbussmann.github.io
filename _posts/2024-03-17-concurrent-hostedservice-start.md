@@ -86,6 +86,8 @@ info: Microsoft.Hosting.Lifetime[0]
 
 Services are now started concurrently and therefore the host startup time of the host was reduced to the slowest service's `StartAsnyc` method instead of a sum of all services.
 
+Sidenote: The next service is only started once the current service yields control back by hitting the first `await` statement within the `StartAsync` method (there are more details and exceptions to this but this goes beyond the scope of this post). If you want to make sure the next service can start as soon as possible, make sure that the `StartAsync` method is actually `async` and that there aren't any expensive operations before the first `await`.
+
 
 ## The problem with concurrent startup
 
