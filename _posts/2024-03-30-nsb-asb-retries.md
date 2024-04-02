@@ -39,7 +39,6 @@ class InterceptingBehavior : Behavior<ITransportReceiveContext>
     {
         // retrieve the ASB native message type to access additional message metadata
         var asbMessage = context.Extensions.Get<ServiceBusReceivedMessage>();
-        // define a value that makes sense in your context
         if (asbMessage.DeliveryCount >= 30)
         {
             throw new MessageDeliveriesExceededException();
