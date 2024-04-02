@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Start at a suistainable pace
+title: Start at a sustainable pace
 ---
 
 I received this advice from my highly valued colleague and co-worker, [Daniel Marbach](https://twitter.com/danielmarbach). While he is a genius software engineer, he is also a gym enthusiast. Some day, I expressed my frustration about the lack of enjoyment and motivation I get from doing fitness exercises. I've mostly tried bodyweight training as I could do my workouts at home, but I failed at completing exercise goals several times. I struggled to find motivation, causing me to find excuses to skip training again and again. At some point, you stop because you give up your hope of achieving your training plan. Daniel's advice was straightforward, and you probably wonder why I even bother to write this down: Set yourself a goal that you are confident of achieving every single time. For me, this goal was to do my exercises just once a week.
