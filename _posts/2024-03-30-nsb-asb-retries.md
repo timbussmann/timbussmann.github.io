@@ -39,7 +39,8 @@ class InterceptingBehavior : Behavior<ITransportReceiveContext>
     {
         // retrieve the ASB native message type to access additional message metadata
         var asbMessage = context.Extensions.Get<ServiceBusReceivedMessage>();
-        if (asbMessage.DeliveryCount >= 10)
+        // define a value that makes sense in your context
+        if (asbMessage.DeliveryCount >= 30)
         {
             throw new MessageDeliveriesExceededException();
         }
@@ -59,6 +60,8 @@ configuration.Pipeline.Register(new InterceptingBehavior(), "Prevents endless re
 configuration.Recoverability().AddUnrecoverableException<MessageDeliveriesExceededException>();
 ```
 
+Note: Make sure to read [number of possible retries in NServiceBus](https://docs.particular.net/nservicebus/recoverability/#total-number-of-possible-retries) when defining the threshold to make sure the behavior doesn't interfere with the regular retries behavior.
+
 ## Conclusion
 
-Understanding how NServiceBus' recoverability feature works can help understand its limitations. Error cases that cause a total process shutdown should be very rare. For most users, it's probably more helpful to monitor their endpoint health well to detect endpoint crashes rather than apply the described solutions. However, there might be cases where the described solutions can help mitigate the problem more reliably, and it's once more a good example of how powerful custom pipeline behaviors are.
+Understanding how NServiceBus' recoverability feature works can help understand its limitations. Error cases that cause a total process shutdown should be very rare. For most users, it's probably more helpful to monitor their endpoint health well to detect endpoint crashes rather than apply the described approaches. However, there might be cases where the described solutions can help mitigate the problem more reliably, and it's once more a good example of how powerful custom pipeline behaviors are.
