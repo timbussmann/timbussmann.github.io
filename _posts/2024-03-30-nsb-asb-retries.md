@@ -3,7 +3,7 @@ layout: post
 title: "Endless retries with NServiceBus"
 ---
 
-One of the benefits of using messaging technologies is the ability to retry messages that failed to process (I also wrote about recoverability concepts [here](https://docs.particular.net/architecture/recoverability)). NServiceBus provides [extensive recoverability features](https://docs.particular.net/nservicebus/recoverability/), like immediate and delayed retries. However, there are scenarios where users might be surprised that these recoverability functions don't correctly apply and messages seem to be processed infinitely instead of being moved to the error queue after exhausting the configured amount of retries.
+One of the benefits of using messaging technologies is the ability to retry messages that failed to process (I also wrote about recoverability concepts [here](https://docs.particular.net/architecture/recoverability)). NServiceBus provides extensive recoverability features, like immediate and delayed retries. However, there are scenarios where users might be surprised that these recoverability functions don't correctly apply and messages seem to be processed infinitely instead of being moved to the error queue after exhausting the configured amount of retries.
 
 ## NServiceBus recoverability
 
@@ -13,11 +13,11 @@ However,  the recoverability pipeline can't be invoked if the NServiceBus endpoi
 
 If the endpoint process constantly crashes on a specific message content, the recoverability features will never have the chance to interrupt this behavior, potentially leading to infinite retries.
 
-Note: The NServiceBus recoverability pipeline can't be invoked preventively, as the pipeline requires the exception details to determine the proper recoverability action. Some transports might store the exception information in memory to deal with transaction limitations (e.g. [MSMQ transport](https://github.com/Particular/NServiceBus.Transport.Msmq/blob/master/src/NServiceBus.Transport.Msmq/SendsAtomicWithReceiveNativeTransactionStrategy.cs#L84)). Still, such approaches also won't work in the described scenario as a process crash also wipes any temporary storage.
+Note: The NServiceBus recoverability pipeline can't be invoked preemptively, as the pipeline requires the exception details to determine the proper recoverability action. Some transports might store the exception information in memory to deal with transaction limitations (e.g. [MSMQ transport](https://github.com/Particular/NServiceBus.Transport.Msmq/blob/master/src/NServiceBus.Transport.Msmq/SendsAtomicWithReceiveNativeTransactionStrategy.cs#L84)). Still, such approaches also won't work in the described scenario as a process crash also wipes any temporary storage.
 
 ## Solutions
 
-To prevent infinite retries of messages, the message processing must be interrupted before executing the offending handler. There is no built-in solution in NServiceBus, but we can build this ourselves depending on the transport used. With the Azure Service Bus transport is relatively easy to achieve: Azure Service Bus already tracks the delivery count of a message internally. We can make use of it in 2 ways:
+To prevent infinite retries of messages, the message processing must be interrupted before executing the offending handler. There is no built-in solution in NServiceBus, but we can build this ourselves depending on the transport used. With the Azure Service Bus transport this is relatively easy to achieve: Azure Service Bus already tracks the delivery count of a message internally. We can make use of it in 2 ways:
 
 ### Azure Service Bus native Dead Letter Queue (DLQ)
 
