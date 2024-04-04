@@ -3,6 +3,8 @@ remote_theme: daviddarnes/alembic
 title: It depends
 description: > # this is multipline section
   Tim's notes.
+repo: https://github.com/timbussmann/timbussmann.github.io
+url: https://timbussmann.github.io/
 
 plugins:
  - jekyll-feed
