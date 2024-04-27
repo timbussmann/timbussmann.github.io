@@ -13,15 +13,15 @@ One of my functions receives a set of CosmosDB documents as an input binding (`I
 
 ## Enabling request buffering
 
-One of my functions is triggered by a HTTP callback from GitHub. To ensure the request comes from GitHub, the request is signed by GitHub. To verify the signature, annoy-o-bot needs to hash the whole request body. The request body is later read again to be deserialized; therefore, the request body is accessed twice. Since the body is a stream, the signature validation logic reset the stream position to 0 after the validation. This worked well in the old in-process hosting model, but resetting the body stream position is no longer allowed by default in the isolated worker model. Using `request.EnableBuffering()` before reading the body will allow changing the stream position again and saved me from rewriting a bigger part of my function to ensure the body is only read once (yes, this would be better and more efficient, but my goal was to migrate with the lowest amount of effort).
+One of my functions is triggered by an HTTP callback from GitHub. To ensure the request comes from GitHub, the request is signed by GitHub. To verify the signature, annoy-o-bot needs to hash the whole request body. The request body is later read again to be deserialized; therefore, the request body is accessed twice. Since the body is a stream, the signature validation logic reset the stream position to 0 after the validation. This worked well in the old in-process hosting model, but resetting the body stream position is no longer allowed by default in the isolated worker model. Using `request.EnableBuffering()` before reading the body will allow changing the stream position again. This workaround saved me from rewriting a bigger part of my function to ensure the body is only read once (yes, this would be better and more efficient, but my goal was to migrate with the lowest amount of effort).
 
-## Async hash computation
+## Async request body access
 
 The above-mentioned logic uses the `HMACSHA256` class to compute the hash. Specifically, it used the `ComputeHash` method, which now started to throw an exception:
 
 > System.InvalidOperationException: Synchronous operations are disallowed.
 
-This is again related to changes to accessing the `request.Body` as the stack trace indicates the source to be some ASP.NET Core HttpRequestStream logic. Switching to the asynchronous `ComputeHashAsync` method solved this issue.
+This is again related to behavioral changes when accessing the `request.Body` as the stack trace indicates the source to be some ASP.NET Core HttpRequestStream logic. Switching to the asynchronous `ComputeHashAsync` method solved this issue. There seem to be alternatives to configure Kestrel to allow synchronous IO access to the request too.
 
 ## Changing CosmosDB property mapping
 
@@ -84,7 +84,7 @@ Now, I hoped there was a better way to do this, but honestly, I was just tired o
 
 ## Conclusion
 
-The migration from the Azure Functions in-process to the isolated hosting model turned out to be a major PITA due to many undocumented little tweaks under the hood. While I enjoy the extremely low operation cost for my little GitHub app thanks to Azure Functions, the hidden complexity of the framework definitely leaked through and bit me quite a bit here and there.
+The migration from the Azure Functions in-process to the isolated hosting model turned out to be a major PITA due to many undocumented little tweaks under the hood. While I enjoy the extremely low operation cost for my little GitHub app thanks to Azure Functions, the hidden complexity of the framework leaked through and bit me quite a bit here and there.
 
 Before I started the migration, I made sure that I had solid test coverage of my app's functionality, which came in handy in verifying that the migration didn't break anything. While this made me more confident in the upgrade, unfortunately, there are too many blind spots around the Azure Functions hosting side that are hard to include in local tests. Running integration tests on an actual Azure Function environment would be an absolute necessity when using Azure Functions professionally.
 
